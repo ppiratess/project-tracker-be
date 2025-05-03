@@ -1,0 +1,53 @@
+networks:
+  project-tracker:
+    driver: bridge
+
+volumes:
+  project-tracker-postgres:
+    name: project-tracker-postgres
+    external: false
+
+services:
+  project-tracker-postgres-server:
+    image: postgres:17.4
+    volumes:
+      - project-tracker-postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    networks:
+      - project-tracker
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  project-tracker-server:
+    container_name: project-tracker-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/home/node/app
+    working_dir: /home/node/app
+    environment:
+      NODE_ENV: development
+    ports:
+      - '3000:3000'
+      - '5555:5555'
+    networks:
+      - project-tracker
+    depends_on:
+      project-tracker-postgres-server:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
