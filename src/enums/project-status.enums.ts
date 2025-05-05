@@ -5,5 +5,4 @@ export enum ProjectStatus {
   ON_HOLD = 'ON_HOLD',
   CANCELLED = 'CANCELLED',
   ARCHIVED = 'ARCHIVED',
-  IN_PROGRESS = 'IN_PROGRESS',
 }

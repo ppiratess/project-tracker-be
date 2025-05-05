@@ -22,6 +22,8 @@ export class Project extends BaseEntity {
   @Column({
     type: 'enum',
     enum: ProjectStatus,
+    nullable: false,
+    default: ProjectStatus.ACTIVE,
   })
   status: ProjectStatus;
 }
