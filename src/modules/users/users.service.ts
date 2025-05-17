@@ -1,8 +1,9 @@
-import { Injectable, Query } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/database/core/user.entity';
 import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, Query } from '@nestjs/common';
+
 import { CreateUserDto } from './dto/users.dto';
+import { User } from 'src/database/core/user.entity';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 
 @Injectable()
@@ -25,16 +26,16 @@ export class UsersService {
     return data;
   }
 
-  findOne(id: number): Promise<User | null> {
+  findOne(id: string): Promise<User | null> {
     return this.userRepository.findOneBy({ id: id.toString() });
   }
 
-  create(createUserDto: CreateUserDto): Promise<User> {
+  register(createUserDto: CreateUserDto): Promise<User> {
     const newUser = this.userRepository.create(createUserDto);
     return this.userRepository.save(newUser);
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     await this.userRepository.delete(id);
   }
 }

@@ -7,14 +7,20 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
-import { User } from 'src/database/core/user.entity';
+
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/users.dto';
+import { User } from 'src/database/core/user.entity';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
+
+  @Post()
+  register(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return this.userService.register(createUserDto);
+  }
 
   @Get()
   findAll(@Query() query: PaginationQueryDto) {
@@ -23,16 +29,11 @@ export class UsersController {
 
   @Get(':id')
   findOne(@Param('id') id: string): Promise<User | null> {
-    return this.userService.findOne(+id);
-  }
-
-  @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.userService.create(createUserDto);
+    return this.userService.findOne(id);
   }
 
   @Delete(':id')
   delete(@Param('id') id: string): Promise<void> {
-    return this.userService.delete(+id);
+    return this.userService.delete(id);
   }
 }
