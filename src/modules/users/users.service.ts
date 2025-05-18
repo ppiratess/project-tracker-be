@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, Query } from '@nestjs/common';
 
+import { HashUtil } from 'src/utls/hash.utils';
 import { CreateUserDto } from './dto/users.dto';
 import { User } from 'src/database/core/user.entity';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
@@ -30,8 +31,14 @@ export class UsersService {
     return this.userRepository.findOneBy({ id: id.toString() });
   }
 
-  register(createUserDto: CreateUserDto): Promise<User> {
-    const newUser = this.userRepository.create(createUserDto);
+  async register(createUserDto: CreateUserDto): Promise<User> {
+    const hashedPassword = await HashUtil.hashPassword(createUserDto.password);
+
+    const newUser = this.userRepository.create({
+      ...createUserDto,
+      password: hashedPassword,
+    });
+
     return this.userRepository.save(newUser);
   }
 
