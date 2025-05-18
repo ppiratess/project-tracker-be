@@ -1,4 +1,6 @@
 import { Column, Entity } from 'typeorm';
+import { Exclude } from 'class-transformer';
+
 import { BaseEntity } from './base.entity';
 import { UserRole } from 'src/enums/user-role.enums';
 
@@ -8,7 +10,8 @@ export class User extends BaseEntity {
   email: string;
 
   @Column()
-  password: string;
+  @Exclude()
+  password?: string;
 
   @Column()
   userName: string;

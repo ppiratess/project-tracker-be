@@ -24,3 +24,12 @@ export class CreateUserDto {
   @IsEnum(UserRole)
   role: UserRole;
 }
+
+export class UserResponseDto {
+  id: string;
+  email: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+}

@@ -1,10 +1,11 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, Query } from '@nestjs/common';
+import { instanceToPlain } from 'class-transformer';
 
 import { HashUtil } from 'src/utls/hash.utils';
-import { CreateUserDto } from './dto/users.dto';
 import { User } from 'src/database/core/user.entity';
+import { CreateUserDto, UserResponseDto } from './dto/users.dto';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 
 @Injectable()
@@ -14,21 +15,25 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  findAll(@Query() query: PaginationQueryDto): Promise<User[]> {
+  async findAll(
+    @Query() query: PaginationQueryDto,
+  ): Promise<UserResponseDto[] | null> {
     const { page = 1, limit = 10 } = query;
-
     const skip = (page - 1) * limit;
 
-    const data = this.userRepository.find({
+    const users = await this.userRepository.find({
       skip,
       take: limit,
     });
 
-    return data;
+    return users.map((user) => instanceToPlain(user) as UserResponseDto);
   }
 
-  findOne(id: string): Promise<User | null> {
-    return this.userRepository.findOneBy({ id: id.toString() });
+  async findOne(id: string): Promise<UserResponseDto | null> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) return null;
+
+    return instanceToPlain(user) as UserResponseDto;
   }
 
   async register(createUserDto: CreateUserDto): Promise<User> {
