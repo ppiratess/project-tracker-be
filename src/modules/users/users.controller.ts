@@ -28,8 +28,8 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<UserResponseDto | null> {
-    return this.userService.findOne(id);
+  findById(@Param('id') id: string): Promise<UserResponseDto | null> {
+    return this.userService.findById(id);
   }
 
   @Delete(':id')

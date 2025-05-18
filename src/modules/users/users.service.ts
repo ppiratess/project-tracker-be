@@ -29,7 +29,7 @@ export class UsersService {
     return users.map((user) => instanceToPlain(user) as UserResponseDto);
   }
 
-  async findOne(id: string): Promise<UserResponseDto | null> {
+  async findById(id: string): Promise<UserResponseDto | null> {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) return null;
 
@@ -49,5 +49,12 @@ export class UsersService {
 
   async delete(id: string): Promise<void> {
     await this.userRepository.delete(id);
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user) return null;
+
+    return user;
   }
 }
