@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/users.dto';
 import { User } from 'src/database/core/user.entity';
+import { CreateUserDto, UserResponseDto } from './dto/users.dto';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 
 @Controller('users')
@@ -28,7 +28,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<User | null> {
+  findOne(@Param('id') id: string): Promise<UserResponseDto | null> {
     return this.userService.findOne(id);
   }
 
