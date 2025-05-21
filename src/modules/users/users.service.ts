@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, Query } from '@nestjs/common';
 import { instanceToPlain } from 'class-transformer';
 
-import { HashUtil } from 'src/utls/hash.utils';
+import { HashUtil } from 'src/utils/hash.utils';
 import { User } from 'src/database/core/user.entity';
 import { CreateUserDto, UserResponseDto } from './dto/users.dto';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
