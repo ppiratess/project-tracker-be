@@ -38,7 +38,6 @@ You can refer to **.env.example** file
 
 ```
 docker compose up --build -d
-
 ```
 
 - To verify containers are running, use Docker Desktop or run:
