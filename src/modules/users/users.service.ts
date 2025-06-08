@@ -57,4 +57,20 @@ export class UsersService {
 
     return user;
   }
+
+  async updateUser(
+    id: string,
+    updateUserDto: Partial<UserResponseDto>,
+  ): Promise<UserResponseDto | null> {
+    const user = await this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      return null;
+    }
+
+    Object.assign(user, updateUserDto);
+    const updatedUser = await this.userRepository.save(user);
+
+    return instanceToPlain(updatedUser) as UserResponseDto;
+  }
 }

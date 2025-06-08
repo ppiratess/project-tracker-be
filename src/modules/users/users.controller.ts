@@ -6,12 +6,13 @@ import {
   Param,
   Delete,
   Query,
+  Put,
 } from '@nestjs/common';
 
 import { UsersService } from './users.service';
 import { User } from 'src/database/core/user.entity';
-import { CreateUserDto, UserResponseDto } from './dto/users.dto';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto/users.dto';
 
 @Controller('users')
 export class UsersController {
@@ -35,5 +36,13 @@ export class UsersController {
   @Delete(':id')
   delete(@Param('id') id: string): Promise<void> {
     return this.userService.delete(id);
+  }
+
+  @Put(':id')
+  updateUser(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto | null> {
+    return this.userService.updateUser(id, updateUserDto);
   }
 }
