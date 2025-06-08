@@ -9,6 +9,7 @@ import {
   RefreshTokenDto,
 } from './dto/auth.dto';
 import { HashUtil } from 'src/utils/hash.utils';
+import { JWT_CONFIG } from 'src/config/app.config';
 import { UsersService } from '../users/users.service';
 import { UserResponseDto } from '../users/dto/users.dto';
 
@@ -32,14 +33,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { sub: user.id, email: user.email };
+    const payload = { userId: user.id, email: user.email };
 
     const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '60s',
+      expiresIn: JWT_CONFIG.ACCESS_TOKEN_EXPIRY,
     });
 
     const refreshToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '7d',
+      expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRY,
     });
 
     const plainUserObject = instanceToPlain(user);
@@ -58,20 +59,20 @@ export class AuthService {
       const payload: JwtPayload =
         await this.jwtService.verifyAsync(refresh_token);
 
-      const user = await this.userService.findByEmail(payload.email);
+      const user = await this.userService.findById(payload.id);
 
       if (!user) {
         throw new UnauthorizedException('User not found');
       }
 
-      const newPayload = { sub: user.id, email: user.email };
+      const newPayload = { userId: user.id, email: user.email };
 
       const accessToken = await this.jwtService.signAsync(newPayload, {
-        expiresIn: '60s',
+        expiresIn: JWT_CONFIG.ACCESS_TOKEN_EXPIRY,
       });
 
       const refreshToken = await this.jwtService.signAsync(newPayload, {
-        expiresIn: '7d',
+        expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRY,
       });
 
       const plainUserObject = instanceToPlain(user);
