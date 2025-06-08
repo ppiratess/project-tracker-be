@@ -55,7 +55,6 @@ export class AuthService {
     const { refresh_token } = request;
 
     try {
-      console.log(' in try block');
       const payload: JwtPayload =
         await this.jwtService.verifyAsync(refresh_token);
 
