@@ -5,8 +5,8 @@ import { instanceToPlain } from 'class-transformer';
 
 import { HashUtil } from 'src/utils/hash.utils';
 import { User } from 'src/database/core/user.entity';
-import { CreateUserDto, UserResponseDto } from './dto/users.dto';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto/users.dto';
 
 @Injectable()
 export class UsersService {
@@ -60,7 +60,7 @@ export class UsersService {
 
   async updateUser(
     id: string,
-    updateUserDto: Partial<UserResponseDto>,
+    updateUserDto: Partial<UpdateUserDto>,
   ): Promise<UserResponseDto | null> {
     const user = await this.userRepository.findOneBy({ id });
 

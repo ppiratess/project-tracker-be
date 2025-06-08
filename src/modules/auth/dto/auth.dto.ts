@@ -1,4 +1,4 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsString, IsUUID } from 'class-validator';
 
 import { UserResponseDto } from 'src/modules/users/dto/users.dto';
 
@@ -24,3 +24,11 @@ export interface JwtPayload extends UserResponseDto {
 }
 
 export type RefreshTokenDto = Pick<AuthResponseDto, 'refresh_token'>;
+
+export class ForgotPasswordDto {
+  @IsUUID()
+  userId: string;
+
+  @IsString()
+  password: string;
+}

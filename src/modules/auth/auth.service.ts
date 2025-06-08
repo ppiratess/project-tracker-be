@@ -1,9 +1,15 @@
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { instanceToPlain } from 'class-transformer';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 import {
   AuthResponseDto,
+  ForgotPasswordDto,
   JwtPayload,
   LoginDto,
   RefreshTokenDto,
@@ -84,6 +90,30 @@ export class AuthService {
       };
     } catch (error) {
       throw new UnauthorizedException(`Token verification failed: ${error}`);
+    }
+  }
+
+  async forgotPassword(
+    request: ForgotPasswordDto,
+  ): Promise<{ message: string }> {
+    const { userId, password } = request;
+
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const hashedPassword = await HashUtil.hashPassword(password);
+
+    try {
+      await this.userService.updateUser(userId, {
+        password: hashedPassword,
+      });
+
+      return { message: 'Password reset successfully' };
+    } catch {
+      throw new InternalServerErrorException('Failed to reset password');
     }
   }
 }
