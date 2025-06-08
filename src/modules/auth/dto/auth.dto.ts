@@ -12,6 +12,7 @@ export class LoginDto {
 
 export interface AuthResponseDto extends UserResponseDto {
   access_token: string;
+  refresh_token: string;
 }
 
 export interface JwtPayload extends UserResponseDto {
@@ -21,3 +22,5 @@ export interface JwtPayload extends UserResponseDto {
   updatedAt: Date;
   deletedAt: Date | null;
 }
+
+export type RefreshTokenDto = Pick<AuthResponseDto, 'refresh_token'>;
