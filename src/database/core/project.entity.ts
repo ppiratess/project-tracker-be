@@ -8,6 +8,9 @@ export class Project extends BaseEntity {
   @Column()
   name: string;
 
+  @Column({ type: 'uuid' })
+  createdBy: string;
+
   @Column()
   description: string;
 
@@ -24,4 +27,7 @@ export class Project extends BaseEntity {
     default: ProjectStatus.ACTIVE,
   })
   status: ProjectStatus;
+
+  @Column({ type: 'uuid', nullable: true })
+  deletedBy: string | null;
 }
