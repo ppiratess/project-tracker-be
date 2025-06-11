@@ -44,7 +44,7 @@ export class ProjectController {
 
   // rbac -> only manager and owner can do it
   @Delete(':id')
-  deleteAProject() {
-    return 'Deleted';
+  deleteAProject(@Param('id') id: string) {
+    return this.projectService.deleteProject(id);
   }
 }

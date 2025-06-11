@@ -91,4 +91,14 @@ export class ProjectService {
       return createResponse(500, 'Failed to update project', error);
     }
   }
+
+  async deleteProject(projectId: string): Promise<BaseResponse> {
+    try {
+      await this.projectRepository.delete({ id: projectId });
+
+      return createResponse(201, 'Project deleted successfully');
+    } catch (error) {
+      return createResponse(500, 'Failed to update project', error);
+    }
+  }
 }
