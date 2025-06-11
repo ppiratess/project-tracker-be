@@ -32,7 +32,7 @@ export class ProjectService {
       });
 
       if (existingProject) {
-        return createResponse(409, `Project with ${name} already exists.`);
+        return createResponse(409, `Project ${name} already exists.`);
       }
 
       const createAProjectData = {
