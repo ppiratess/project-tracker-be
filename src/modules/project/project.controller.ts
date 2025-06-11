@@ -11,6 +11,8 @@ import { Request } from 'express';
 
 import { ProjectService } from './project.service';
 import { CreateAProjectDto } from './dto/project.dto';
+import { Project } from 'src/database/core/project.entity';
+import { BaseResponse } from 'src/utils/base-response.util';
 
 @Controller('project')
 export class ProjectController {
@@ -21,7 +23,7 @@ export class ProjectController {
   createAProject(
     @Req() request: Request,
     @Body() createAProjectDto: CreateAProjectDto,
-  ): Promise<any> {
+  ): Promise<BaseResponse<Project>> {
     return this.projectService.createProject(request, createAProjectDto);
   }
 

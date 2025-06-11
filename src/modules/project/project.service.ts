@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { JwtUtils } from 'src/utils/jwt.utils';
 import { CreateAProjectDto } from './dto/project.dto';
 import { Project } from 'src/database/core/project.entity';
+import { BaseResponse, createResponse } from 'src/utils/base-response.util';
 
 @Injectable()
 export class ProjectService {
@@ -18,18 +19,33 @@ export class ProjectService {
   async createProject(
     request: Request,
     createProjectDto: CreateAProjectDto,
-  ): Promise<any> {
+  ): Promise<BaseResponse<Project>> {
     try {
+      const { name } = createProjectDto;
+
       const decodedUserData = this.jwtUtils.getUserFromRequest(request);
+
+      const existingProject = await this.projectRepository.findOne({
+        where: {
+          name,
+        },
+      });
+
+      if (existingProject) {
+        return createResponse(409, `Project with ${name} already exists.`);
+      }
 
       const createAProjectData = {
         ...createProjectDto,
         createdBy: decodedUserData.userId,
       };
-      return this.projectRepository.save(createAProjectData);
+
+      const savedProject =
+        await this.projectRepository.save(createAProjectData);
+
+      return createResponse(201, 'Project created successfully', savedProject);
     } catch (error) {
-      console.log('error', error);
-      return error;
+      return createResponse(500, 'Failed to create project', error);
     }
   }
 }
