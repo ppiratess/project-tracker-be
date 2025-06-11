@@ -1,9 +1,10 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsNotEmpty } from 'class-validator';
 
 import { ProjectStatus } from 'src/enums/project-status.enums';
 
 export class CreateAProjectDto {
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @IsString()
@@ -11,7 +12,7 @@ export class CreateAProjectDto {
   description: string;
 
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   startDate: string;
 
   @IsString()
@@ -19,5 +20,6 @@ export class CreateAProjectDto {
   endDate: string | null;
 
   @IsEnum(ProjectStatus)
+  @IsNotEmpty()
   status: ProjectStatus;
 }
