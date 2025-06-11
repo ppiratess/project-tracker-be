@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Post,
+  Req,
+} from '@nestjs/common';
+import { Request } from 'express';
 
 import { ProjectService } from './project.service';
 import { CreateAProjectDto } from './dto/project.dto';
@@ -9,8 +18,11 @@ export class ProjectController {
 
   // rbac -> only manager and owner can do it
   @Post()
-  createAProject(@Body() createAProjectDto: CreateAProjectDto): Promise<any> {
-    return this.projectService.createProject(createAProjectDto);
+  createAProject(
+    @Req() request: Request,
+    @Body() createAProjectDto: CreateAProjectDto,
+  ): Promise<any> {
+    return this.projectService.createProject(request, createAProjectDto);
   }
 
   @Get(':id')
