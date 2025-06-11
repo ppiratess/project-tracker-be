@@ -2,7 +2,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
-  UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
@@ -30,9 +30,20 @@ export class RolesGuard implements CanActivate {
 
     try {
       const user = this.jwtUtils.getUserFromRequest(request);
-      return requiredRoles.includes(user.role);
-    } catch {
-      throw new UnauthorizedException('Invalid or missing token');
+
+      if (!requiredRoles.includes(user.role)) {
+        throw new ForbiddenException(
+          'You do not have permission to access this resource',
+        );
+      }
+
+      return true;
+    } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw error;
+      }
+
+      throw new ForbiddenException('Access denied. Invalid credentials.');
     }
   }
 }
