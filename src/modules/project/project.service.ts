@@ -48,4 +48,22 @@ export class ProjectService {
       return createResponse(500, 'Failed to create project', error);
     }
   }
+
+  async getProjectById(projectId: string): Promise<BaseResponse<Project>> {
+    try {
+      const project = await this.projectRepository.findOne({
+        where: {
+          id: projectId,
+        },
+      });
+
+      if (!project) {
+        return createResponse(404, 'Requested project could not be found');
+      }
+
+      return createResponse(200, 'Project retrieved successfully', project);
+    } catch (error) {
+      return createResponse(500, 'Failed to get project details', error);
+    }
+  }
 }

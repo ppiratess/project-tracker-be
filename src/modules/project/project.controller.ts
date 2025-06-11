@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
   Req,
@@ -28,8 +29,8 @@ export class ProjectController {
   }
 
   @Get(':id')
-  getAProject() {
-    return 'Project';
+  getAProject(@Param('id') id: string): Promise<BaseResponse<Project>> {
+    return this.projectService.getProjectById(id);
   }
 
   // rbac -> only manager and owner and qa can do it
