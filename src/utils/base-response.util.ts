@@ -1,4 +1,4 @@
-export interface BaseResponse<T> {
+export interface BaseResponse<T = undefined | null> {
   status: number;
   message: string;
   data?: T;
