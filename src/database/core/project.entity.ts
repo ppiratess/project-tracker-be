@@ -16,9 +16,6 @@ export class Project extends BaseEntity {
   @Column()
   endDate: Date;
 
-  @Column({ default: false })
-  isActive: boolean;
-
   @Column({
     type: 'enum',
     enum: ProjectStatus,
