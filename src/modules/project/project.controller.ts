@@ -4,16 +4,16 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
+  Put,
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
 
 import { ProjectService } from './project.service';
-import { CreateAProjectDto } from './dto/project.dto';
 import { Project } from 'src/database/core/project.entity';
 import { BaseResponse } from 'src/utils/base-response.util';
+import { CreateAProjectDto, UpdateAProjectDto } from './dto/project.dto';
 
 @Controller('project')
 export class ProjectController {
@@ -34,9 +34,12 @@ export class ProjectController {
   }
 
   // rbac -> only manager and owner and qa can do it
-  @Patch(':id')
-  updateAProject() {
-    return 'Updated';
+  @Put(':id')
+  updateAProject(
+    @Param('id') id: string,
+    @Body() updateProjectDto: UpdateAProjectDto,
+  ): Promise<BaseResponse<Project>> {
+    return this.projectService.updateProject(id, updateProjectDto);
   }
 
   // rbac -> only manager and owner can do it

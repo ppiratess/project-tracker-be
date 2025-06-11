@@ -4,8 +4,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { JwtUtils } from 'src/utils/jwt.utils';
-import { CreateAProjectDto } from './dto/project.dto';
 import { Project } from 'src/database/core/project.entity';
+import { CreateAProjectDto, UpdateAProjectDto } from './dto/project.dto';
 import { BaseResponse, createResponse } from 'src/utils/base-response.util';
 
 @Injectable()
@@ -64,6 +64,31 @@ export class ProjectService {
       return createResponse(200, 'Project retrieved successfully', project);
     } catch (error) {
       return createResponse(500, 'Failed to get project details', error);
+    }
+  }
+
+  async updateProject(
+    projectId: string,
+    updates: UpdateAProjectDto,
+  ): Promise<BaseResponse<Project>> {
+    try {
+      const project = await this.projectRepository.findOneBy({ id: projectId });
+
+      if (!project) {
+        return createResponse(404, 'Requested project could not be found');
+      }
+
+      Object.assign(project, updates);
+
+      const updatedProject = await this.projectRepository.save(project);
+
+      return createResponse(
+        200,
+        'Project updated successfully',
+        updatedProject,
+      );
+    } catch (error) {
+      return createResponse(500, 'Failed to update project', error);
     }
   }
 }
