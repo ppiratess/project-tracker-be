@@ -1,4 +1,5 @@
 import { Column, Entity } from 'typeorm';
+
 import { BaseEntity } from './base.entity';
 import { ProjectStatus } from 'src/enums/project-status.enums';
 
@@ -13,8 +14,8 @@ export class Project extends BaseEntity {
   @Column()
   startDate: Date;
 
-  @Column()
-  endDate: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  endDate: Date | null;
 
   @Column({
     type: 'enum',
