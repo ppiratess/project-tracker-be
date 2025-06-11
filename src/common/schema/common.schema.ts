@@ -1,3 +1,5 @@
+import { UserRole } from 'src/enums/user-role.enums';
+
 export interface BaseResponseSchema {
   message: string;
 }
@@ -7,4 +9,5 @@ export interface UserDetailsFromToken {
   email: string;
   iat: number;
   exp: number;
+  role: UserRole;
 }

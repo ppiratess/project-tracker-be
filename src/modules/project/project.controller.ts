@@ -7,19 +7,24 @@ import {
   Post,
   Put,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
 
 import { ProjectService } from './project.service';
+import { UserRole } from 'src/enums/user-role.enums';
 import { Project } from 'src/database/core/project.entity';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 import { BaseResponse } from 'src/utils/base-response.util';
+import { Roles } from 'src/common/decorators/roles.decorators';
 import { CreateAProjectDto, UpdateAProjectDto } from './dto/project.dto';
 
+@UseGuards(RolesGuard)
 @Controller('project')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
-  // rbac -> only manager and owner can do it
+  @Roles(UserRole.OWNER, UserRole.MANAGER)
   @Post()
   createAProject(
     @Req() request: Request,
@@ -33,7 +38,7 @@ export class ProjectController {
     return this.projectService.getProjectById(id);
   }
 
-  // rbac -> only manager and owner and qa can do it
+  @Roles(UserRole.OWNER, UserRole.MANAGER, UserRole.QA)
   @Put(':id')
   updateAProject(
     @Param('id') id: string,
@@ -42,7 +47,7 @@ export class ProjectController {
     return this.projectService.updateProject(id, updateProjectDto);
   }
 
-  // rbac -> only manager and owner can do it
+  @Roles(UserRole.OWNER, UserRole.MANAGER)
   @Delete(':id')
   deleteAProject(@Param('id') id: string) {
     return this.projectService.deleteProject(id);

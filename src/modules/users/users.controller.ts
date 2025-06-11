@@ -11,6 +11,7 @@ import {
 
 import { UsersService } from './users.service';
 import { User } from 'src/database/core/user.entity';
+import { Public } from '../auth/decorators/public.decorator';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto/users.dto';
 
@@ -18,6 +19,7 @@ import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto/users.dto';
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
+  @Public()
   @Post()
   register(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.userService.register(createUserDto);
