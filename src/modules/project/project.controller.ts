@@ -52,4 +52,9 @@ export class ProjectController {
   deleteAProject(@Param('id') id: string) {
     return this.projectService.deleteProject(id);
   }
+
+  @Get()
+  getAllProject() {
+    return this.projectService.getAllProject();
+  }
 }

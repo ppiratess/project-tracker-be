@@ -101,4 +101,14 @@ export class ProjectService {
       return createResponse(500, 'Failed to update project', error);
     }
   }
+
+  async getAllProject() {
+    try {
+      const projects = await this.projectRepository.find({});
+
+      return createResponse(200, 'Projets fetched successfully.', projects);
+    } catch (error) {
+      return createResponse(500, 'Failed to get project', error);
+    }
+  }
 }
