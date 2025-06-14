@@ -3,10 +3,13 @@ import { Repository } from 'typeorm';
 import { Injectable, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
+import {
+  CreateAProjectDto,
+  GetAllProjectQueryDto,
+  UpdateAProjectDto,
+} from './dto/project.dto';
 import { JwtUtils } from 'src/utils/jwt.utils';
 import { Project } from 'src/database/core/project.entity';
-import { RequestQueryDto } from 'src/common/dto/common.dto';
-import { CreateAProjectDto, UpdateAProjectDto } from './dto/project.dto';
 import { BaseResponse, createResponse } from 'src/utils/base-response.util';
 
 @Injectable()
@@ -104,10 +107,10 @@ export class ProjectService {
   }
 
   async getAllProject(
-    @Query() query: RequestQueryDto,
+    @Query() query: GetAllProjectQueryDto,
   ): Promise<BaseResponse<Project[]>> {
     try {
-      const { page = 1, perPage = 10, search } = query;
+      const { page = 1, perPage = 10, search, status, createdBy } = query;
 
       const queryBuilder = this.projectRepository.createQueryBuilder('project');
 
@@ -116,6 +119,26 @@ export class ProjectService {
           'project.name ILIKE :search OR project.description ILIKE :search',
           { search: `%${search}%` },
         );
+      }
+
+      if (status && status.length > 0) {
+        if (search) {
+          queryBuilder.andWhere('project.status IN (:...status)', { status });
+        } else {
+          queryBuilder.where('project.status IN (:...status)', { status });
+        }
+      }
+
+      if (createdBy && createdBy.length > 0) {
+        if (search) {
+          queryBuilder.andWhere('project.createdBy IN (:...createdBy)', {
+            createdBy,
+          });
+        } else {
+          queryBuilder.where('project.createdBy IN (:...createdBy)', {
+            createdBy,
+          });
+        }
       }
 
       queryBuilder

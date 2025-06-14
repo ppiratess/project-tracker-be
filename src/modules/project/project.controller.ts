@@ -12,14 +12,17 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 
+import {
+  CreateAProjectDto,
+  GetAllProjectQueryDto,
+  UpdateAProjectDto,
+} from './dto/project.dto';
 import { ProjectService } from './project.service';
 import { UserRole } from 'src/enums/user-role.enums';
 import { Project } from 'src/database/core/project.entity';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { BaseResponse } from 'src/utils/base-response.util';
-import { RequestQueryDto } from 'src/common/dto/common.dto';
 import { Roles } from 'src/common/decorators/roles.decorators';
-import { CreateAProjectDto, UpdateAProjectDto } from './dto/project.dto';
 
 @UseGuards(RolesGuard)
 @Controller('project')
@@ -57,7 +60,7 @@ export class ProjectController {
 
   @Get()
   getAllProject(
-    @Query() query: RequestQueryDto,
+    @Query() query: GetAllProjectQueryDto,
   ): Promise<BaseResponse<Project[]>> {
     return this.projectService.getAllProject(query);
   }
