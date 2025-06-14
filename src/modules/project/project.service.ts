@@ -154,12 +154,12 @@ export class ProjectService {
         perPage,
       };
 
-      return createResponse(
-        200,
-        'Projects fetched successfully.',
-        projects,
-        paginationBody,
-      );
+      const responseMessage =
+        projects.length === 0
+          ? 'No projects found'
+          : 'Projects fetched successfully.';
+
+      return createResponse(200, responseMessage, projects, paginationBody);
     } catch (error) {
       return createResponse(500, 'Failed to get project', error);
     }
