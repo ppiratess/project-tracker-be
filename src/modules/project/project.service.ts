@@ -1,10 +1,11 @@
 import { Request } from 'express';
 import { Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { JwtUtils } from 'src/utils/jwt.utils';
 import { Project } from 'src/database/core/project.entity';
+import { RequestQueryDto } from 'src/common/dto/common.dto';
 import { CreateAProjectDto, UpdateAProjectDto } from './dto/project.dto';
 import { BaseResponse, createResponse } from 'src/utils/base-response.util';
 
@@ -102,11 +103,40 @@ export class ProjectService {
     }
   }
 
-  async getAllProject() {
+  async getAllProject(
+    @Query() query: RequestQueryDto,
+  ): Promise<BaseResponse<Project[]>> {
     try {
-      const projects = await this.projectRepository.find({});
+      const { page = 1, perPage = 10, search } = query;
 
-      return createResponse(200, 'Projets fetched successfully.', projects);
+      const queryBuilder = this.projectRepository.createQueryBuilder('project');
+
+      if (search) {
+        queryBuilder.where(
+          'project.name ILIKE :search OR project.description ILIKE :search',
+          { search: `%${search}%` },
+        );
+      }
+
+      queryBuilder
+        .skip((page - 1) * perPage)
+        .take(perPage)
+        .orderBy('project.createdAt', 'DESC');
+
+      const [projects, total] = await queryBuilder.getManyAndCount();
+
+      const paginationBody = {
+        total,
+        page,
+        perPage,
+      };
+
+      return createResponse(
+        200,
+        'Projects fetched successfully.',
+        projects,
+        paginationBody,
+      );
     } catch (error) {
       return createResponse(500, 'Failed to get project', error);
     }
