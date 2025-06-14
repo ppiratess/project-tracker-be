@@ -18,12 +18,12 @@ export class UsersService {
   async findAll(
     @Query() query: PaginationQueryDto,
   ): Promise<UserResponseDto[] | null> {
-    const { page = 1, limit = 10 } = query;
-    const skip = (page - 1) * limit;
+    const { page = 1, perPage = 10 } = query;
+    const skip = (page - 1) * perPage;
 
     const users = await this.userRepository.find({
       skip,
-      take: limit,
+      take: perPage,
     });
 
     return users.map((user) => instanceToPlain(user) as UserResponseDto);
