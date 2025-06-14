@@ -5,7 +5,7 @@ export interface BaseResponse<T = undefined | null> {
   pagination?: {
     total: number;
     page: number;
-    pageSize: number;
+    perPage: number;
   };
 }
 
