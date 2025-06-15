@@ -23,9 +23,6 @@ export class ProjectMembers extends BaseEntity {
   @Column({ default: true })
   isActive: boolean;
 
-  @Column({ default: false })
-  isDeleted: boolean;
-
   @ManyToOne(() => Project, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
   project: Project;
