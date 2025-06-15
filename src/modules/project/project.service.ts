@@ -9,6 +9,7 @@ import {
   GetAllProjectQueryDto,
   SingleProjectResponse,
   UpdateAProjectDto,
+  UpdateProjectStatusDto,
 } from './dto/project.dto';
 import { JwtUtils } from 'src/utils/jwt.utils';
 import { Project } from 'src/database/core/project.entity';
@@ -222,6 +223,34 @@ export class ProjectService {
       return createResponse(200, 'Project members assigned successfully');
     } catch (error) {
       return createResponse(500, 'Failed to assign members to project', error);
+    }
+  }
+
+  async updateProjectMemberStatus(
+    projectId: string,
+    body: UpdateProjectStatusDto,
+  ) {
+    try {
+      const { userId, isActive } = body;
+
+      const member = await this.projectMemberRepository.findOne({
+        where: {
+          userId,
+          projectId,
+        },
+      });
+
+      if (!member) {
+        return createResponse(404, 'User does not exist in project');
+      }
+
+      member.isActive = isActive;
+
+      await this.projectMemberRepository.save(member);
+
+      return createResponse(200, 'Member status updated successfully', member);
+    } catch (error) {
+      return createResponse(500, 'Failed to update project member', error);
     }
   }
 }

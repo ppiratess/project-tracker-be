@@ -8,6 +8,7 @@ import {
   IsArray,
   IsUUID,
   ValidateNested,
+  IsBoolean,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 
@@ -101,4 +102,12 @@ export class AssignMembersDto {
 export class SingleProjectResponse {
   project: Project;
   projectMembers: ProjectMembers[];
+}
+
+export class UpdateProjectStatusDto {
+  @IsUUID()
+  userId: string;
+
+  @IsBoolean()
+  isActive: boolean;
 }

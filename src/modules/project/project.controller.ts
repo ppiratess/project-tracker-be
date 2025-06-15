@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -19,6 +20,7 @@ import {
   GetAllProjectQueryDto,
   SingleProjectResponse,
   UpdateAProjectDto,
+  UpdateProjectStatusDto,
 } from './dto/project.dto';
 import { ProjectService } from './project.service';
 import { UserRole } from 'src/enums/user-role.enums';
@@ -76,5 +78,16 @@ export class ProjectController {
     @Body() assignMembersDto: AssignMembersDto,
   ) {
     return this.projectService.assignUserToProject(projectId, assignMembersDto);
+  }
+
+  @Patch(':projectId/member-status')
+  updateMemberStatus(
+    @Param('projectId', new ParseUUIDPipe()) projectId: string,
+    @Body() updateProjectStatusDto: UpdateProjectStatusDto,
+  ) {
+    return this.projectService.updateProjectMemberStatus(
+      projectId,
+      updateProjectStatusDto,
+    );
   }
 }
