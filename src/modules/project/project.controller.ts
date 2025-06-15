@@ -80,13 +80,16 @@ export class ProjectController {
     return this.projectService.assignUserToProject(projectId, assignMembersDto);
   }
 
+  @Roles(UserRole.OWNER, UserRole.MANAGER, UserRole.QA)
   @Patch(':projectId/member-status')
   updateMemberStatus(
     @Param('projectId', new ParseUUIDPipe()) projectId: string,
+    @Req() request: Request,
     @Body() updateProjectStatusDto: UpdateProjectStatusDto,
   ) {
     return this.projectService.updateProjectMemberStatus(
       projectId,
+      request,
       updateProjectStatusDto,
     );
   }

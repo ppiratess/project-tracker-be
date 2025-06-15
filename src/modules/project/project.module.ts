@@ -7,6 +7,7 @@ import { ProjectService } from './project.service';
 import { ProjectController } from './project.controller';
 import { Project } from 'src/database/core/project.entity';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { RbacService } from 'src/common/service/rbac.service';
 import { ProjectMembers } from 'src/database/core/project-members.entity';
 
 @Module({
@@ -18,8 +19,9 @@ import { ProjectMembers } from 'src/database/core/project-members.entity';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    RbacService,
   ],
   controllers: [ProjectController],
-  exports: [JwtUtils],
+  exports: [JwtUtils, RbacService],
 })
 export class ProjectModule {}

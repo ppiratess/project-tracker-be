@@ -13,6 +13,7 @@ import {
 } from './dto/project.dto';
 import { JwtUtils } from 'src/utils/jwt.utils';
 import { Project } from 'src/database/core/project.entity';
+import { RbacService } from 'src/common/service/rbac.service';
 import { ProjectMembers } from 'src/database/core/project-members.entity';
 import { BaseResponse, createResponse } from 'src/utils/base-response.util';
 
@@ -24,6 +25,7 @@ export class ProjectService {
     private readonly jwtUtils: JwtUtils,
     @InjectRepository(ProjectMembers)
     private readonly projectMemberRepository: Repository<ProjectMembers>,
+    private readonly rbacService: RbacService,
   ) {}
 
   async createProject(
@@ -228,24 +230,32 @@ export class ProjectService {
 
   async updateProjectMemberStatus(
     projectId: string,
+    request: Request,
     body: UpdateProjectStatusDto,
   ) {
     try {
       const { userId, isActive } = body;
 
+      const requestUser = this.jwtUtils.getUserFromRequest(request);
+
       const member = await this.projectMemberRepository.findOne({
-        where: {
-          userId,
-          projectId,
-        },
+        where: { userId, projectId },
       });
 
       if (!member) {
         return createResponse(404, 'User does not exist in project');
       }
 
-      member.isActive = isActive;
+      const canRequestUserManageRole = this.rbacService.canManageRole(
+        requestUser.role,
+        member.role,
+      );
 
+      if (!canRequestUserManageRole) {
+        return createResponse(403, 'You do not have enough permission');
+      }
+
+      member.isActive = isActive;
       await this.projectMemberRepository.save(member);
 
       return createResponse(200, 'Member status updated successfully', member);
