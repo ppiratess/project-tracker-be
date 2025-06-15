@@ -206,7 +206,6 @@ export class ProjectService {
         if (existing) {
           existing.role = assignment.role;
           existing.isActive = true;
-          existing.isDeleted = false;
           return existing;
         } else {
           const newMember = new ProjectMembers();
@@ -214,7 +213,6 @@ export class ProjectService {
           newMember.userId = assignment.userId;
           newMember.role = assignment.role;
           newMember.isActive = true;
-          newMember.isDeleted = false;
           return newMember;
         }
       });
