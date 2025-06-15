@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
   Query,
@@ -13,8 +14,10 @@ import {
 import { Request } from 'express';
 
 import {
+  AssignMembersDto,
   CreateAProjectDto,
   GetAllProjectQueryDto,
+  SingleProjectResponse,
   UpdateAProjectDto,
 } from './dto/project.dto';
 import { ProjectService } from './project.service';
@@ -39,7 +42,9 @@ export class ProjectController {
   }
 
   @Get(':id')
-  getAProject(@Param('id') id: string): Promise<BaseResponse<Project>> {
+  getAProject(
+    @Param('id') id: string,
+  ): Promise<BaseResponse<SingleProjectResponse>> {
     return this.projectService.getProjectById(id);
   }
 
@@ -63,5 +68,13 @@ export class ProjectController {
     @Query() query: GetAllProjectQueryDto,
   ): Promise<BaseResponse<Project[]>> {
     return this.projectService.getAllProject(query);
+  }
+
+  @Post(':projectId/assign')
+  assignMember(
+    @Param('projectId', new ParseUUIDPipe()) projectId: string,
+    @Body() assignMembersDto: AssignMembersDto,
+  ) {
+    return this.projectService.assignUserToProject(projectId, assignMembersDto);
   }
 }

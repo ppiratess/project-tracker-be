@@ -7,11 +7,15 @@ import {
   MaxLength,
   IsArray,
   IsUUID,
+  ValidateNested,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 
+import { UserRole } from 'src/enums/user-role.enums';
+import { Project } from 'src/database/core/project.entity';
 import { RequestQueryDto } from 'src/common/dto/common.dto';
 import { ProjectStatus } from 'src/enums/project-status.enums';
+import { ProjectMembers } from 'src/database/core/project-members.entity';
 
 export class CreateAProjectDto {
   @IsString()
@@ -77,4 +81,24 @@ export class GetAllProjectQueryDto extends RequestQueryDto {
   )
   @Type(() => String)
   createdBy?: string;
+}
+
+export class AssignMemberDto {
+  @IsUUID()
+  userId: string;
+
+  @IsEnum(UserRole)
+  role: UserRole;
+}
+
+export class AssignMembersDto {
+  @ValidateNested({ each: true })
+  @Type(() => AssignMemberDto)
+  @IsArray()
+  assignments: AssignMemberDto[];
+}
+
+export class SingleProjectResponse {
+  project: Project;
+  projectMembers: ProjectMembers[];
 }

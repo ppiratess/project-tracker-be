@@ -1,15 +1,18 @@
 import { Request } from 'express';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Injectable, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import {
+  AssignMembersDto,
   CreateAProjectDto,
   GetAllProjectQueryDto,
+  SingleProjectResponse,
   UpdateAProjectDto,
 } from './dto/project.dto';
 import { JwtUtils } from 'src/utils/jwt.utils';
 import { Project } from 'src/database/core/project.entity';
+import { ProjectMembers } from 'src/database/core/project-members.entity';
 import { BaseResponse, createResponse } from 'src/utils/base-response.util';
 
 @Injectable()
@@ -18,6 +21,8 @@ export class ProjectService {
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
     private readonly jwtUtils: JwtUtils,
+    @InjectRepository(ProjectMembers)
+    private readonly projectMemberRepository: Repository<ProjectMembers>,
   ) {}
 
   async createProject(
@@ -53,7 +58,9 @@ export class ProjectService {
     }
   }
 
-  async getProjectById(projectId: string): Promise<BaseResponse<Project>> {
+  async getProjectById(
+    projectId: string,
+  ): Promise<BaseResponse<SingleProjectResponse>> {
     try {
       const project = await this.projectRepository.findOne({
         where: {
@@ -65,7 +72,16 @@ export class ProjectService {
         return createResponse(404, 'Requested project could not be found');
       }
 
-      return createResponse(200, 'Project retrieved successfully', project);
+      const projectMembers = await this.projectMemberRepository.find({
+        where: { projectId },
+      });
+
+      const response = {
+        project,
+        projectMembers,
+      };
+
+      return createResponse(200, 'Project retrieved successfully', response);
     } catch (error) {
       return createResponse(500, 'Failed to get project details', error);
     }
@@ -100,7 +116,7 @@ export class ProjectService {
     try {
       await this.projectRepository.delete({ id: projectId });
 
-      return createResponse(201, 'Project deleted successfully');
+      return createResponse(200, 'Project deleted successfully');
     } catch (error) {
       return createResponse(500, 'Failed to update project', error);
     }
@@ -162,6 +178,52 @@ export class ProjectService {
       return createResponse(200, responseMessage, projects, paginationBody);
     } catch (error) {
       return createResponse(500, 'Failed to get project', error);
+    }
+  }
+
+  async assignUserToProject(
+    projectId: string,
+    assignMembersDto: AssignMembersDto,
+  ) {
+    try {
+      const assignments = assignMembersDto.assignments;
+
+      const userIds = assignments.map((assignment) => assignment.userId);
+
+      const existingMembers = await this.projectMemberRepository.find({
+        where: {
+          projectId,
+          userId: In(userIds),
+        },
+      });
+
+      const existingMap = new Map(
+        existingMembers.map((user) => [user.userId, user]),
+      );
+
+      const membersToSave = assignments.map((assignment) => {
+        const existing = existingMap.get(assignment.userId);
+        if (existing) {
+          existing.role = assignment.role;
+          existing.isActive = true;
+          existing.isDeleted = false;
+          return existing;
+        } else {
+          const newMember = new ProjectMembers();
+          newMember.projectId = projectId;
+          newMember.userId = assignment.userId;
+          newMember.role = assignment.role;
+          newMember.isActive = true;
+          newMember.isDeleted = false;
+          return newMember;
+        }
+      });
+
+      await this.projectMemberRepository.save(membersToSave);
+
+      return createResponse(200, 'Project members assigned successfully');
+    } catch (error) {
+      return createResponse(500, 'Failed to assign members to project', error);
     }
   }
 }
