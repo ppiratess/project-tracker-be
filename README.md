@@ -31,12 +31,14 @@ git clone https://github.com/ppiratess/project-tracker-be.git
 #### Step 2: Create a .env file in the root
 
 Go into the project directory
+
 ```
 cd project-tracker-be
 ```
-Create a ```.env``` file. You can refer to **.env.example** file.
 
-#### Step 3: Step 3: Start the application using Docker
+Create a `.env` file. You can refer to **.env.example** file.
+
+#### Step 3: Start the application using Docker
 
 - Build and run the containers in detached mode:
 
@@ -49,14 +51,15 @@ docker compose up --build -d
 ```
 docker ps
 ```
-If you encounter any error along the lines of "port 3000 already in use. " You can either stop the application that is using the port or you can choose the next port for the host in file named ```compose```, in the section.
+
+If you encounter any error along the lines of "port 3000 already in use. " You can either stop the application that is using the port or you can choose the next port for the host in file named `compose`, in the section.
 The format is <host_port>:<container_port>
+
 ```
 ports:
       - '3000:3000'
       - '5555:5555'
 ```
-
 
 #### Step 4: Verify the application
 
