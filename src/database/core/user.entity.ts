@@ -4,7 +4,7 @@ import { Exclude } from 'class-transformer';
 import { BaseEntity } from './base.entity';
 import { UserRole } from 'src/enums/user-role.enums';
 
-@Entity()
+@Entity('users')
 export class User extends BaseEntity {
   @Column()
   email: string;
