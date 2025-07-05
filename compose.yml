@@ -35,8 +35,7 @@ services:
     volumes:
       - .:/home/node/app
     working_dir: /home/node/app
-    environment:
-      NODE_ENV: development
+    env_file: '.env'
     ports:
       - '3000:3000'
       - '5555:5555'
