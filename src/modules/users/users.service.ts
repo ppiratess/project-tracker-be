@@ -5,6 +5,8 @@ import { instanceToPlain } from 'class-transformer';
 
 import { HashUtil } from 'src/utils/hash.utils';
 import { User } from 'src/database/core/user.entity';
+import { createResponse } from 'src/utils/base-response.util';
+import { TPromiseBaseResponse } from 'src/common/schema/types';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto/users.dto';
 
@@ -36,15 +38,25 @@ export class UsersService {
     return instanceToPlain(user) as UserResponseDto;
   }
 
-  async register(createUserDto: CreateUserDto): Promise<User> {
-    const hashedPassword = await HashUtil.hashPassword(createUserDto.password);
+  async register(createUserDto: CreateUserDto): TPromiseBaseResponse<User> {
+    const { email, password } = createUserDto;
+
+    const user = await this.findByEmail(email);
+
+    if (user) {
+      return createResponse(200, `User with ${email} already exits`);
+    }
+
+    const hashedPassword = await HashUtil.hashPassword(password);
 
     const newUser = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
     });
 
-    return this.userRepository.save(newUser);
+    const savedUser = await this.userRepository.save(newUser);
+
+    return createResponse(201, 'User registered successfully', savedUser);
   }
 
   async delete(id: string): Promise<void> {
