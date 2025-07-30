@@ -189,6 +189,11 @@ export class ProjectService {
     assignMembersDto: AssignMembersDto,
   ) {
     try {
+      const projectDetails = await this.getProjectById(projectId);
+
+      if (projectDetails.status !== 200) {
+        return createResponse(404, projectDetails?.message);
+      }
       const assignments = assignMembersDto.assignments;
 
       const userIds = assignments.map((assignment) => assignment.userId);
@@ -206,6 +211,7 @@ export class ProjectService {
 
       const membersToSave = assignments.map((assignment) => {
         const existing = existingMap.get(assignment.userId);
+
         if (existing) {
           existing.role = assignment.role;
           existing.isActive = true;
@@ -223,8 +229,8 @@ export class ProjectService {
       await this.projectMemberRepository.save(membersToSave);
 
       return createResponse(200, 'Project members assigned successfully');
-    } catch (error) {
-      return createResponse(500, 'Failed to assign members to project', error);
+    } catch {
+      return createResponse(500, 'Failed to assign members to project');
     }
   }
 
