@@ -7,3 +7,12 @@ export enum ProjectStatus {
   CANCELLED = 'CANCELLED',
   ARCHIVED = 'ARCHIVED',
 }
+
+export enum ProjectTaskStatus {
+  TODO = 'TODO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  BLOCKED = 'BLOCKED',
+  ON_HOLD = 'ON_HOLD',
+  CANCELLED = 'CANCELLED',
+}
