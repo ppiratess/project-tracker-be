@@ -118,7 +118,6 @@ export class UsersService {
       }
     }
 
-    // Apply updates to the original user object
     Object.assign(user, updateUserDto);
 
     const updatedUser = await this.userRepository.save(user);
