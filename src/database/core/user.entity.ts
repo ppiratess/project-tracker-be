@@ -29,4 +29,7 @@ export class User extends BaseEntity {
     default: UserRole.GUEST,
   })
   role: UserRole;
+
+  @Column({ nullable: true })
+  avatar?: string;
 }
