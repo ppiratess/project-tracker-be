@@ -39,20 +39,24 @@ export class UsersController {
   }
 
   @Get(':id')
-  findById(@Param('id') id: string): Promise<UserResponseDto | null> {
+  findById(
+    @Param('id') id: string,
+  ): TPromiseBaseResponse<UserResponseDto | null> {
     return this.userService.findById(id);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<void> {
+  delete(@Param('id') id: string): TPromiseBaseResponse<void> {
     return this.userService.delete(id);
   }
 
   @Put(':id')
+  @UseInterceptors(FileInterceptor('avatar'))
   updateUser(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<UserResponseDto | null> {
-    return this.userService.updateUser(id, updateUserDto);
+    @UploadedFile() file?: Express.Multer.File,
+  ): TPromiseBaseResponse<UserResponseDto> {
+    return this.userService.updateUser(id, updateUserDto, file);
   }
 }

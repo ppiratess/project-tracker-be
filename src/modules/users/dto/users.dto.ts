@@ -39,6 +39,7 @@ export class UserResponseDto {
   firstName: string;
   lastName: string;
   role: UserRole;
+  avatar?: string;
 }
 
 export class UpdateUserDto {

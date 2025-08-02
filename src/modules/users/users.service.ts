@@ -21,7 +21,7 @@ export class UsersService {
 
   async findAll(
     @Query() query: PaginationQueryDto,
-  ): Promise<UserResponseDto[] | null> {
+  ): TPromiseBaseResponse<UserResponseDto[] | null> {
     const { page = 1, perPage = 10 } = query;
     const skip = (page - 1) * perPage;
 
@@ -30,14 +30,22 @@ export class UsersService {
       take: perPage,
     });
 
-    return users.map((user) => instanceToPlain(user) as UserResponseDto);
+    return createResponse(
+      200,
+      'Users retrieved successfully',
+      users.map((user) => instanceToPlain(user) as UserResponseDto),
+    );
   }
 
-  async findById(id: string): Promise<UserResponseDto | null> {
+  async findById(id: string): TPromiseBaseResponse<UserResponseDto | null> {
     const user = await this.userRepository.findOneBy({ id });
-    if (!user) return null;
+    if (!user) return createResponse(404, 'User not found');
 
-    return instanceToPlain(user) as UserResponseDto;
+    return createResponse(
+      200,
+      'Users retrieved successfully',
+      instanceToPlain(user) as UserResponseDto,
+    );
   }
 
   async register(
@@ -77,8 +85,10 @@ export class UsersService {
     }
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string): TPromiseBaseResponse<void> {
     await this.userRepository.delete(id);
+
+    return createResponse(200, 'User deleted successfully');
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -91,16 +101,32 @@ export class UsersService {
   async updateUser(
     id: string,
     updateUserDto: Partial<UpdateUserDto>,
-  ): Promise<UserResponseDto | null> {
+    file?: Express.Multer.File,
+  ): TPromiseBaseResponse<UserResponseDto> {
     const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
-      return null;
+      return createResponse(404, 'User not found');
     }
 
+    if (file) {
+      try {
+        const uploadedImage = await this.cloudinaryService.uploadFile(file);
+        user.avatar = uploadedImage;
+      } catch {
+        return createResponse(500, 'Failed to upload avatar image');
+      }
+    }
+
+    // Apply updates to the original user object
     Object.assign(user, updateUserDto);
+
     const updatedUser = await this.userRepository.save(user);
 
-    return instanceToPlain(updatedUser) as UserResponseDto;
+    return createResponse(
+      200,
+      'User updated successfully',
+      instanceToPlain(updatedUser) as UserResponseDto,
+    );
   }
 }
