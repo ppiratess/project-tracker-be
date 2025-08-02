@@ -8,10 +8,11 @@ import { ProjectController } from './project.controller';
 import { Project } from 'src/database/core/project.entity';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { RbacService } from 'src/common/service/rbac.service';
+import { ProjectTasks } from 'src/database/core/project-tasks.entity';
 import { ProjectMembers } from 'src/database/core/project-members.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Project, ProjectMembers])],
+  imports: [TypeOrmModule.forFeature([Project, ProjectMembers, ProjectTasks])],
   providers: [
     ProjectService,
     JwtUtils,

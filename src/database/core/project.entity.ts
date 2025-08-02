@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 
 import { BaseEntity } from './base.entity';
-import { ProjectTask } from './project-tasks.entity';
+import { ProjectTasks } from './project-tasks.entity';
 import { ProjectStatus } from 'src/enums/project-status.enums';
 
 @Entity()
@@ -32,6 +32,6 @@ export class Project extends BaseEntity {
   @Column({ type: 'uuid', nullable: true })
   deletedBy: string | null;
 
-  @OneToMany(() => ProjectTask, (task) => task.project)
-  tasks: ProjectTask[];
+  @OneToMany(() => ProjectTasks, (task) => task.project)
+  tasks: ProjectTasks[];
 }
