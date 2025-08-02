@@ -8,6 +8,7 @@ import { User } from 'src/database/core/user.entity';
 import { createResponse } from 'src/utils/base-response.util';
 import { TPromiseBaseResponse } from 'src/common/schema/types';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { CloudinaryService } from 'src/config/cloudinary/cloudinary.service';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto/users.dto';
 
 @Injectable()
@@ -15,6 +16,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async findAll(
@@ -38,25 +40,41 @@ export class UsersService {
     return instanceToPlain(user) as UserResponseDto;
   }
 
-  async register(createUserDto: CreateUserDto): TPromiseBaseResponse<User> {
+  async register(
+    createUserDto: CreateUserDto,
+    file?: Express.Multer.File,
+  ): TPromiseBaseResponse<User> {
     const { email, password } = createUserDto;
 
-    const user = await this.findByEmail(email);
-
-    if (user) {
-      return createResponse(200, `User with ${email} already exits`);
+    const existingUser = await this.findByEmail(email);
+    if (existingUser) {
+      return createResponse(200, `User with ${email} already exists`);
     }
 
     const hashedPassword = await HashUtil.hashPassword(password);
+    let avatarUrl: string | undefined;
+
+    if (file) {
+      try {
+        const uploadedImage = await this.cloudinaryService.uploadFile(file);
+        avatarUrl = uploadedImage;
+      } catch {
+        return createResponse(500, 'Failed to upload avatar image');
+      }
+    }
 
     const newUser = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
+      avatar: avatarUrl,
     });
 
-    const savedUser = await this.userRepository.save(newUser);
-
-    return createResponse(201, 'User registered successfully', savedUser);
+    try {
+      const savedUser = await this.userRepository.save(newUser);
+      return createResponse(201, 'User registered successfully', savedUser);
+    } catch {
+      return createResponse(500, 'Error saving user to the database');
+    }
   }
 
   async delete(id: string): Promise<void> {

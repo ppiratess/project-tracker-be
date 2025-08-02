@@ -7,7 +7,10 @@ import {
   Delete,
   Query,
   Put,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { UsersService } from './users.service';
 import { User } from 'src/database/core/user.entity';
@@ -22,8 +25,12 @@ export class UsersController {
 
   @Public()
   @Post()
-  register(@Body() createUserDto: CreateUserDto): TPromiseBaseResponse<User> {
-    return this.userService.register(createUserDto);
+  @UseInterceptors(FileInterceptor('avatar'))
+  register(
+    @Body() createUserDto: CreateUserDto,
+    @UploadedFile() file: Express.Multer.File,
+  ): TPromiseBaseResponse<User> {
+    return this.userService.register(createUserDto, file);
   }
 
   @Get()
