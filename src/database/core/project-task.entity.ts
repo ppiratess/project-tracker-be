@@ -4,7 +4,7 @@ import { ProjectTaskStatus } from 'src/enums/project-status.enums';
 import { User } from './user.entity';
 import { BaseEntity } from './base.entity';
 
-@Entity()
+@Entity('project_tasks')
 export class ProjectTask extends BaseEntity {
   @Column()
   name: string;
