@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 
 import { BaseEntity } from './base.entity';
-import { ProjectTask } from './project-task.entity';
+import { ProjectTask } from './project-tasks.entity';
 import { ProjectStatus } from 'src/enums/project-status.enums';
 
 @Entity()

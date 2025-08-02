@@ -1,8 +1,9 @@
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
-import { Project } from './project.entity';
-import { ProjectTaskStatus } from 'src/enums/project-status.enums';
+
 import { User } from './user.entity';
+import { Project } from './project.entity';
 import { BaseEntity } from './base.entity';
+import { ProjectTaskStatus } from 'src/enums/project-status.enums';
 
 @Entity('project_tasks')
 export class ProjectTask extends BaseEntity {
