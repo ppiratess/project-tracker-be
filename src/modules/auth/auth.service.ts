@@ -65,7 +65,9 @@ export class AuthService {
       const payload: JwtPayload =
         await this.jwtService.verifyAsync(refresh_token);
 
-      const user = await this.userService.findById(payload.id);
+      const userResponse = await this.userService.findById(payload.id);
+
+      const user = userResponse?.data;
 
       if (!user) {
         throw new UnauthorizedException('User not found');
