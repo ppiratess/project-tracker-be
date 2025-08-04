@@ -1,12 +1,15 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
-import { User } from './user.entity';
 import { BaseEntity } from './base.entity';
 import { Project } from './project.entity';
 import { ProjectTaskStatus } from 'src/enums/project-status.enums';
+import { ProjectTaskMembers } from './project-task-members.entity';
 
 @Entity()
 export class ProjectTasks extends BaseEntity {
+  @Column({ type: 'uuid' })
+  projectId: string;
+
   @Column()
   name: string;
 
@@ -30,9 +33,10 @@ export class ProjectTasks extends BaseEntity {
   })
   status: ProjectTaskStatus;
 
-  @ManyToMany(() => User, { eager: false })
-  @JoinTable()
-  members: User[];
+  @OneToMany(() => ProjectTaskMembers, (member) => member.task, {
+    cascade: true,
+  })
+  members: ProjectTaskMembers[];
 
   @ManyToOne(() => Project, (project) => project.tasks, {
     nullable: false,
