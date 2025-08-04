@@ -24,6 +24,7 @@ import {
 } from './dto/project.dto';
 import { ProjectService } from './project.service';
 import { UserRole } from 'src/enums/user-role.enums';
+import { CreateTaskDto } from './dto/project-task.dto';
 import { Project } from 'src/database/core/project.entity';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { BaseResponse } from 'src/utils/base-response.util';
@@ -91,6 +92,19 @@ export class ProjectController {
       projectId,
       request,
       updateProjectStatusDto,
+    );
+  }
+
+  @Post(':projectId/tasks')
+  createProjectTask(
+    @Param('projectId', new ParseUUIDPipe()) projectId: string,
+    @Req() request: Request,
+    @Body() createTaskDto: CreateTaskDto,
+  ) {
+    return this.projectService.createProjectTask(
+      projectId,
+      request,
+      createTaskDto,
     );
   }
 }

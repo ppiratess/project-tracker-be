@@ -11,11 +11,17 @@ import {
   UpdateAProjectDto,
   UpdateProjectStatusDto,
 } from './dto/project.dto';
+import { validateUserIds } from './helpers';
 import { JwtUtils } from 'src/utils/jwt.utils';
+import { User } from 'src/database/core/user.entity';
+import { CreateTaskDto } from './dto/project-task.dto';
 import { Project } from 'src/database/core/project.entity';
 import { RbacService } from 'src/common/service/rbac.service';
+import { ProjectTaskStatus } from 'src/enums/project-status.enums';
+import { ProjectTasks } from 'src/database/core/project-tasks.entity';
 import { ProjectMembers } from 'src/database/core/project-members.entity';
 import { BaseResponse, createResponse } from 'src/utils/base-response.util';
+import { ProjectTaskMembers } from 'src/database/core/project-task-members.entity';
 
 @Injectable()
 export class ProjectService {
@@ -26,6 +32,12 @@ export class ProjectService {
     @InjectRepository(ProjectMembers)
     private readonly projectMemberRepository: Repository<ProjectMembers>,
     private readonly rbacService: RbacService,
+    @InjectRepository(ProjectTasks)
+    private readonly projectTaskRepository: Repository<ProjectTasks>,
+    @InjectRepository(ProjectTaskMembers)
+    private readonly projectTaskMembersRepository: Repository<ProjectTaskMembers>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async createProject(
@@ -244,9 +256,10 @@ export class ProjectService {
 
       const requestUser = this.jwtUtils.getUserFromRequest(request);
 
-      const member = await this.projectMemberRepository.findOne({
-        where: { userId, projectId },
-      });
+      const member: ProjectMembers | null =
+        await this.projectMemberRepository.findOne({
+          where: { userId, projectId },
+        });
 
       if (!member) {
         return createResponse(404, 'User does not exist in project');
@@ -267,6 +280,69 @@ export class ProjectService {
       return createResponse(200, 'Member status updated successfully', member);
     } catch (error) {
       return createResponse(500, 'Failed to update project member', error);
+    }
+  }
+
+  async createProjectTask(
+    projectId: string,
+    request: Request,
+    createTaskDto: CreateTaskDto,
+  ) {
+    try {
+      const {
+        name,
+        description,
+        startDate,
+        endDate,
+        status = ProjectTaskStatus.TODO,
+        assignedUserIds,
+      } = createTaskDto;
+
+      const project = await this.projectRepository.findOneBy({ id: projectId });
+
+      if (!project) {
+        return createResponse(404, 'Project not found');
+      }
+
+      const missingUserIds = await validateUserIds(
+        assignedUserIds,
+        this.userRepository,
+      );
+
+      if (missingUserIds.length > 0) {
+        return createResponse(
+          400,
+          `These user ${missingUserIds.length === 1 ? 'ID' : 'IDs'} ${missingUserIds.length === 1 ? 'does' : 'do'} not exist in the project : ${missingUserIds.join(', ')}`,
+        );
+      }
+
+      const requestUser = this.jwtUtils.getUserFromRequest(request);
+
+      const task = this.projectTaskRepository.create({
+        name,
+        description,
+        startDate: new Date(startDate),
+        endDate: endDate ? new Date(endDate) : null,
+        status,
+        createdBy: requestUser.userId,
+        project,
+        projectId,
+      });
+
+      await this.projectTaskRepository.save(task);
+
+      const memberEntities = assignedUserIds.map((userId) =>
+        this.projectTaskMembersRepository.create({
+          user: { id: userId },
+          task,
+        }),
+      );
+
+      await this.projectTaskMembersRepository.save(memberEntities);
+
+      return createResponse(200, 'Task created successfully', task);
+    } catch (error) {
+      return createResponse(500, 'Failed to create project task', error);
     }
   }
 }
